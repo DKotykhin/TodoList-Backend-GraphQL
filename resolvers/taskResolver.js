@@ -32,6 +32,7 @@ const taskResolver = {
             const totalPagesQty = Math.ceil(totalTasksQty / tasksOnPage);
 
             const tasks = await TaskModel.find(taskFilter, {
+                _id: true,
                 title: true,
                 subtitle: true,
                 description: true,
