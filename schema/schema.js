@@ -93,7 +93,8 @@ const schema = buildSchema(`
         sortOrder: Int
         search: String
     }
-    input TaskInput {       
+    input TaskInput {
+        _id: ID       
         title: String!
         subtitle: String
         description: String
@@ -107,6 +108,7 @@ const schema = buildSchema(`
     type Query {        
         getUserByToken: User        
         deleteAvatar: AvatarUserResponse
+        getTasks(paramsInput: TaskParamsInput): getTasksResponse
     }
     
     type Mutation {
@@ -117,7 +119,6 @@ const schema = buildSchema(`
         userUpdatePassword(passwordInput: UserPasswordInput): User
         confirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
         uploadAvatar(avatarInput: UserAvatarInput): AvatarUserResponse
-        getTasks(paramsInput: TaskParamsInput): getTasksResponse
         createTask(createTaskInput: TaskInput): Task
         updateTask(updateTaskInput: TaskInput): updateTaskResponse
         deleteTask(deleteTaskInput: TaskDeleteInput): deleteTaskResponse
