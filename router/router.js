@@ -15,8 +15,7 @@ router.use('/graphql', (req, res) => {
         rootValue: { ...userResolver, ...passwordResolver, ...avatarResolver, ...taskResolver },
         graphiql: true,
         context: {
-            auth: req.headers.authorization,
-            query: req.query
+            auth: req.headers.authorization
         },
         customFormatErrorFn: (err) => {
             return ({ message: err.message })

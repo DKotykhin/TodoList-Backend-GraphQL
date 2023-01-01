@@ -30,7 +30,7 @@ const userResolver = {
             }
             const { _id, email, name, createdAt, avatarURL } = user;
             return {
-                id: _id, email, name, createdAt, avatarURL,
+                _id, email, name, createdAt, avatarURL,
                 message: `User ${name} successfully logged via token`,
             };
         } else {
@@ -55,7 +55,7 @@ const userResolver = {
         const { _id, createdAt } = user;
 
         return {
-            id: _id, email, name, createdAt, token,
+            _id, email, name, createdAt, token,
             message: `User ${name} successfully created`,
         };
     },
@@ -75,7 +75,7 @@ const userResolver = {
         const { _id, name, avatarURL, createdAt } = user;
 
         return {
-            id: _id, name, avatarURL, createdAt, token,
+            _id, name, avatarURL, createdAt, token,
             message: `User ${name} successfully logged`
         };
     },
@@ -106,7 +106,7 @@ const userResolver = {
             const { _id, email, avatarURL, createdAt } = updatedUser;
 
             return {
-                id: _id, email, name: updatedUser.name, avatarURL, createdAt,
+                _id, email, name: updatedUser.name, avatarURL, createdAt,
                 message: `User ${updatedUser.name} successfully updated`,
             };
         } else {
@@ -114,29 +114,35 @@ const userResolver = {
         }
     },
 
-    userDelete: async (_, context) => {
+    userDelete: async ({ deleteInput }, context) => {
         const id = checkAuth(context.auth);
         if (id) {
+            const { _id } = deleteInput;
             const user = await UserModel.findById(id);
             if (!user) {
                 throw new Error("Can't find user")
             }
 
-            if (user.avatarURL) {
-                fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
-                    if (err) {
-                        throw new Error("Can't delete avatar")
-                    }
-                })
-            }
+            if (id === _id) {
+                if (user.avatarURL) {
+                    fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
+                        if (err) {
+                            throw new Error("Can't delete avatar")
+                        }
+                    })
+                }
+                const taskStatus = await TaskModel.deleteMany({ author: id });
+                const userStatus = await UserModel.deleteOne({ _id: id });
 
-            const taskStatus = await TaskModel.deleteMany({ author: id });
-            const userStatus = await UserModel.deleteOne({ _id: id });
-
-            return {
-                taskStatus, userStatus,
-                message: 'User successfully deleted'
+                return {
+                    taskStatus, userStatus,
+                    message: 'User successfully deleted'
+                }
+            } else {
+                throw new Error("Authification error")
             }
+        } else {
+            throw new Error('No autorization data')
         }
     }
 

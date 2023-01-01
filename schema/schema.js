@@ -3,7 +3,7 @@ import { buildSchema } from "graphql";
 const schema = buildSchema(`
     scalar Date
     type User {
-        id: ID!
+        _id: ID!
         name: String!
         email: String!
         avatarURL: String        
@@ -29,7 +29,7 @@ const schema = buildSchema(`
         message: String
     }
     type Task {
-        id: ID!
+        _id: ID!
         title: String!
         subtitle: String
         description: String
@@ -82,6 +82,17 @@ const schema = buildSchema(`
     input UserAvatarInput {       
         avatarURL: String!                      
     }
+    input UserDeleteInput {       
+        _id: ID!                      
+    }
+    input TaskParamsInput {
+        limit: Int
+        page: Int
+        tabKey: Int
+        sortField: String
+        sortOrder: Int
+        search: String
+    }
     input TaskInput {       
         title: String!
         subtitle: String
@@ -89,27 +100,27 @@ const schema = buildSchema(`
         completed: Boolean
         deadline: Date        
     }
-    input DeleteInput {
-        id: ID!
+    input TaskDeleteInput {
+        _id: ID!
     }
 
     type Query {        
         getUserByToken: User        
-        userDelete: DeleteUserResponse
         deleteAvatar: AvatarUserResponse
-        getTasks: getTasksResponse
     }
-
+    
     type Mutation {
         userRegister(registerInput: UserRegisterInput): User
         userLogin(loginInput: UserLoginInput): User
+        userDelete(deleteInput: UserDeleteInput): DeleteUserResponse
         userUpdateName(nameInput: UserNameInput): User
         userUpdatePassword(passwordInput: UserPasswordInput): User
         confirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
         uploadAvatar(avatarInput: UserAvatarInput): AvatarUserResponse
+        getTasks(paramsInput: TaskParamsInput): getTasksResponse
         createTask(createTaskInput: TaskInput): Task
         updateTask(updateTaskInput: TaskInput): updateTaskResponse
-        deleteTask(deleteTaskInput: DeleteInput): deleteTaskResponse
+        deleteTask(deleteTaskInput: TaskDeleteInput): deleteTaskResponse
     }
 `);
 
