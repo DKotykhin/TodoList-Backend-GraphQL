@@ -48,7 +48,7 @@ const passwordResolver = {
         }
     },
 
-    confirmPassword: async ({ passwordInput }, context) => {
+    userConfirmPassword: async ({ passwordInput }, context) => {
         if (Object.keys(passwordInput).length === 0) {
             throw new Error("No data");
         };

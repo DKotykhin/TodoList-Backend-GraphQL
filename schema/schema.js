@@ -107,18 +107,18 @@ const schema = buildSchema(`
 
     type Query {        
         getUserByToken: User        
-        deleteAvatar: AvatarUserResponse
         getTasks(paramsInput: TaskParamsInput): getTasksResponse
+        userLogin(loginInput: UserLoginInput): User
     }
     
     type Mutation {
         userRegister(registerInput: UserRegisterInput): User
-        userLogin(loginInput: UserLoginInput): User
         userDelete(deleteInput: UserDeleteInput): DeleteUserResponse
         userUpdateName(nameInput: UserNameInput): User
+        userConfirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
         userUpdatePassword(passwordInput: UserPasswordInput): User
-        confirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
-        uploadAvatar(avatarInput: UserAvatarInput): AvatarUserResponse
+        uploadAvatar(uploadAvatarInput: UserAvatarInput): AvatarUserResponse
+        deleteAvatar(deleteAvatarInput: UserDeleteInput): AvatarUserResponse
         createTask(createTaskInput: TaskInput): Task
         updateTask(updateTaskInput: TaskInput): updateTaskResponse
         deleteTask(deleteTaskInput: TaskDeleteInput): deleteTaskResponse
