@@ -8,8 +8,7 @@ const taskResolver = {
         const id = checkAuth(context.auth);
 
         if (id) {
-            const params = paramsInput ? paramsInput : {};
-            console.log(params);
+            const params = paramsInput ? paramsInput : {};            
             const { limit, page, tabKey, sortField, sortOrder, search} = params;
             const tasksOnPage = limit > 0 ? limit : 6;
             const pageNumber = page > 0 ? page : 1;
