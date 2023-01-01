@@ -8,7 +8,7 @@ import UserModel from '../models/User.js';
 const avatarResolver = {
 
     uploadAvatar: async ({ uploadAvatarInput }, context) => {
-        if (Object.keys(avatarInput).length === 0) {
+        if (Object.keys(uploadAvatarInput).length === 0) {
             throw new Error("No data");
         };
 
