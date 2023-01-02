@@ -112,10 +112,9 @@ const userResolver = {
         }
     },
 
-    userDelete: async ({ deleteInput }, context) => {
+    userDelete: async ({  _id }, context) => {
         const id = checkAuth(context.auth);
-        if (id) {
-            const { _id } = deleteInput;
+        if (id) {            
             const user = await UserModel.findById(id);
             if (!user) {
                 throw new Error("Can't find user")

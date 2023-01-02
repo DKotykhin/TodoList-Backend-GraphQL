@@ -7,14 +7,13 @@ import UserModel from '../models/User.js';
 
 const avatarResolver = {
 
-    uploadAvatar: async ({ uploadAvatarInput }, context) => {
-        if (Object.keys(uploadAvatarInput).length === 0) {
+    uploadAvatar: async ({ avatarURL }, context) => {
+        if (!avatarURL) {
             throw new Error("No data");
         };
 
-        await userValidate(uploadAvatarInput);
-        const id = checkAuth(context.auth);
-        const { avatarURL } = uploadAvatarInput;
+        await userValidate({ avatarURL });
+        const id = checkAuth(context.auth);        
 
         if (id) {
             const user = await UserModel.findOneAndUpdate(
@@ -35,11 +34,10 @@ const avatarResolver = {
         }
     },
 
-    deleteAvatar: async ({ deleteAvatarInput }, context) => {
+    deleteAvatar: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
 
-        if (id) {
-            const { _id } = deleteAvatarInput;
+        if (id) {           
             const user = await UserModel.findById(id);
             if (!user) {
                 throw new Error("Can't find user")

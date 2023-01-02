@@ -110,10 +110,9 @@ const taskResolver = {
         }
     },
 
-    deleteTask: async ({ deleteTaskInput }, context) => {
+    deleteTask: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
-        const { _id } = deleteTaskInput;
-
+        
         const status = await TaskModel.deleteOne({ _id, author: id });
         if (!status.deletedCount) {
             throw new Error("Deleted forbidden")

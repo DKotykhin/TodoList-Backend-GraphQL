@@ -68,16 +68,7 @@ const schema = buildSchema(`
         name: String!
         email: String!
         password: String!          
-    }    
-    input UserPasswordInput {       
-        password: String!                      
-    }
-    input UserAvatarInput {       
-        avatarURL: String!                      
-    }
-    input UserDeleteInput {       
-        _id: ID!                      
-    }
+    }       
     input TaskParamsInput {
         limit: Int
         page: Int
@@ -94,10 +85,7 @@ const schema = buildSchema(`
         completed: Boolean
         deadline: Date        
     }
-    input TaskDeleteInput {
-        _id: ID!
-    }
-
+    
     type Query {        
         getUserByToken: User        
         getTasks(paramsInput: TaskParamsInput): getTasksResponse
@@ -106,15 +94,15 @@ const schema = buildSchema(`
     
     type Mutation {
         userRegister(registerInput: UserRegisterInput): User
-        userDelete(deleteInput: UserDeleteInput): DeleteUserResponse
+        userDelete(_id: ID!): DeleteUserResponse
         userUpdateName(name: String!): User
-        userConfirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
-        userUpdatePassword(passwordInput: UserPasswordInput): User
-        uploadAvatar(uploadAvatarInput: UserAvatarInput): AvatarUserResponse
-        deleteAvatar(deleteAvatarInput: UserDeleteInput): AvatarUserResponse
+        userConfirmPassword(password: String!): PasswordUserResponse
+        userUpdatePassword(password: String!): User
+        uploadAvatar(avatarURL: String!): AvatarUserResponse
+        deleteAvatar(_id: ID!): AvatarUserResponse
         createTask(createTaskInput: TaskInput): Task
         updateTask(updateTaskInput: TaskInput): updateTaskResponse
-        deleteTask(deleteTaskInput: TaskDeleteInput): deleteTaskResponse
+        deleteTask(_id: ID!): deleteTaskResponse
     }
 `);
 

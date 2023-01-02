@@ -12,8 +12,8 @@ const createPasswordHash = async (password) => {
 
 const passwordResolver = {    
 
-    userUpdatePassword: async ({ passwordInput }, context) => {
-        if (Object.keys(passwordInput).length === 0) {
+    userUpdatePassword: async ({ password }, context) => {
+        if (!password) {
             throw new Error("No data");
         };
 
@@ -24,9 +24,8 @@ const passwordResolver = {
                 throw new Error("Can't find user")
             }
 
-            await userValidate(passwordInput);
-
-            const { password } = passwordInput;
+            await userValidate({ password });
+            
             const isValidPass = await bcrypt.compare(password, user.passwordHash);
             if (isValidPass) {
                 throw new Error("The same password!")
@@ -48,8 +47,8 @@ const passwordResolver = {
         }
     },
 
-    userConfirmPassword: async ({ passwordInput }, context) => {
-        if (Object.keys(passwordInput).length === 0) {
+    userConfirmPassword: async ({ password }, context) => {
+        if (!password) {
             throw new Error("No data");
         };
 
@@ -60,9 +59,8 @@ const passwordResolver = {
                 throw new Error("Can't find user")
             }
 
-            await userValidate(passwordInput);
-
-            const { password } = passwordInput;
+            await userValidate({ password });
+            
             const isValidPass = await bcrypt.compare(password, user.passwordHash);
             if (!isValidPass) {
                 return { status: false, message: "Wrong password!" }
