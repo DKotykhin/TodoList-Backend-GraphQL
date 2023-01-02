@@ -60,9 +60,8 @@ const userResolver = {
         };
     },
 
-    userLogin: async ({ loginInput }) => {
-        await userValidate(loginInput);
-        const { email, password } = loginInput;
+    userLogin: async ({ email, password }) => {
+        await userValidate({ email, password });        
         const user = await UserModel.findOne({ email });
         if (!user) {
             throw new Error("Can't find user")
@@ -80,8 +79,8 @@ const userResolver = {
         };
     },
 
-    userUpdateName: async ({ nameInput }, context) => {
-        if (Object.keys(nameInput).length === 0) {
+    userUpdateName: async ({ name }, context) => {
+        if (!name) {
             throw new Error("No data");
         };
 
@@ -92,9 +91,8 @@ const userResolver = {
                 throw new Error("Can't find user")
             }
 
-            await userValidate(nameInput);
-
-            const { name } = nameInput;
+            await userValidate({ name });
+            
             if (name === user.name) {
                 throw new Error("The same name!")
             };

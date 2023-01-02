@@ -68,14 +68,7 @@ const schema = buildSchema(`
         name: String!
         email: String!
         password: String!          
-    }
-    input UserLoginInput {       
-        email: String!
-        password: String!               
-    }
-    input UserNameInput {       
-        name: String!                      
-    }
+    }    
     input UserPasswordInput {       
         password: String!                      
     }
@@ -108,13 +101,13 @@ const schema = buildSchema(`
     type Query {        
         getUserByToken: User        
         getTasks(paramsInput: TaskParamsInput): getTasksResponse
-        userLogin(loginInput: UserLoginInput): User
+        userLogin(email: String!, password: String!): User
     }
     
     type Mutation {
         userRegister(registerInput: UserRegisterInput): User
         userDelete(deleteInput: UserDeleteInput): DeleteUserResponse
-        userUpdateName(nameInput: UserNameInput): User
+        userUpdateName(name: String!): User
         userConfirmPassword(passwordInput: UserPasswordInput): PasswordUserResponse
         userUpdatePassword(passwordInput: UserPasswordInput): User
         uploadAvatar(uploadAvatarInput: UserAvatarInput): AvatarUserResponse
