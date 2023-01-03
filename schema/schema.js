@@ -11,20 +11,20 @@ const schema = buildSchema(`
         token: String
         message: String              
     }
-    type PasswordUserResponse {
+    type UserPasswordResponse {
         status: Boolean
         message: String
     }
-    type DeleteUserResponse {
-        taskStatus: DeleteUserStatus
-        userStatus: DeleteUserStatus
+    type UserDeleteResponse {
+        taskStatus: UserDeleteStatus
+        userStatus: UserDeleteStatus
         message: String
     }
-    type DeleteUserStatus { 
+    type UserDeleteStatus { 
         acknowledged: Boolean
         deletedCount: Int
     }
-    type AvatarUserResponse {
+    type UserAvatarResponse {
         avatarURL: String
         message: String
     }
@@ -39,21 +39,21 @@ const schema = buildSchema(`
         updatedAt: Date
         message: String
     }
-    type updateTaskResponse {
-        status: UpdateTaskStatus        
+    type TaskUpdateResponse {
+        status: TaskUpdateStatus        
         message: String
     }
-    type UpdateTaskStatus {
+    type TaskUpdateStatus {
         matchedCount: Int
         modifiedCount: Int
         upsertedId: ID
         acknowledged: Boolean
     }
-    type deleteTaskResponse {
-        status: DeleteTaskStatus        
+    type TaskDeleteResponse {
+        status: TaskDeleteStatus        
         message: String 
     }
-    type DeleteTaskStatus {
+    type TaskDeleteStatus {
         acknowledged: Boolean
         deletedCount: Int
     }
@@ -94,15 +94,15 @@ const schema = buildSchema(`
     
     type Mutation {
         userRegister(registerInput: UserRegisterInput): User
-        userDelete(_id: ID!): DeleteUserResponse
+        userDelete(_id: ID!): UserDeleteResponse
         userUpdateName(name: String!): User
-        userConfirmPassword(password: String!): PasswordUserResponse
-        userUpdatePassword(password: String!): User
-        uploadAvatar(avatarURL: String!): AvatarUserResponse
-        deleteAvatar(_id: ID!): AvatarUserResponse
+        userConfirmPassword(password: String!): UserPasswordResponse
+        userUpdatePassword(password: String!): UserPasswordResponse
+        uploadAvatar(avatarURL: String!): UserAvatarResponse
+        deleteAvatar(_id: ID!): UserAvatarResponse
         createTask(createTaskInput: TaskInput): Task
-        updateTask(updateTaskInput: TaskInput): updateTaskResponse
-        deleteTask(_id: ID!): deleteTaskResponse
+        updateTask(updateTaskInput: TaskInput): TaskUpdateResponse
+        deleteTask(_id: ID!): TaskDeleteResponse
     }
 `);
 

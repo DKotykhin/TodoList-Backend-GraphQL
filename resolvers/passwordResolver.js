@@ -10,7 +10,7 @@ const createPasswordHash = async (password) => {
     return passwordHash
 };
 
-const passwordResolver = {    
+const passwordResolver = {
 
     userUpdatePassword: async ({ password }, context) => {
         if (!password) {
@@ -25,7 +25,7 @@ const passwordResolver = {
             }
 
             await userValidate({ password });
-            
+
             const isValidPass = await bcrypt.compare(password, user.passwordHash);
             if (isValidPass) {
                 throw new Error("The same password!")
@@ -36,12 +36,18 @@ const passwordResolver = {
                 { passwordHash },
                 { returnDocument: 'after' },
             );
-            const { _id, email, name, avatarURL, createdAt } = updatedUser;
 
-            return {
-                id: _id, email, name, avatarURL, createdAt,
-                message: `Password successfully updated`,
-            };
+            if (updatedUser) {
+                return {
+                    status: true,
+                    message: "Password successfully updated",
+                };
+            } else {
+                return {
+                    status: false,
+                    message: "Can't change password",
+                };
+            }
         } else {
             throw new Error('No autorization data')
         }
@@ -60,10 +66,13 @@ const passwordResolver = {
             }
 
             await userValidate({ password });
-            
+
             const isValidPass = await bcrypt.compare(password, user.passwordHash);
             if (!isValidPass) {
-                return { status: false, message: "Wrong password!" }
+                return {
+                    status: false,
+                    message: "Wrong password!"
+                }
             } else {
                 return {
                     status: true,
