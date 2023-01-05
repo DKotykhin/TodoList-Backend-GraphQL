@@ -13,10 +13,6 @@ const createPasswordHash = async (password) => {
 const passwordResolver = {
 
     userUpdatePassword: async ({ password }, context) => {
-        if (!password) {
-            throw new Error("No data");
-        };
-
         const id = checkAuth(context.auth);
         if (id) {
             const user = await UserModel.findById(id);
@@ -25,7 +21,6 @@ const passwordResolver = {
             }
 
             await userValidate({ password });
-
             const isValidPass = await bcrypt.compare(password, user.passwordHash);
             if (isValidPass) {
                 throw new Error("The same password!")
@@ -54,10 +49,6 @@ const passwordResolver = {
     },
 
     userConfirmPassword: async ({ password }, context) => {
-        if (!password) {
-            throw new Error("No data");
-        };
-
         const id = checkAuth(context.auth);
         if (id) {
             const user = await UserModel.findById(id);

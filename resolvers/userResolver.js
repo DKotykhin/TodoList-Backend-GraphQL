@@ -61,7 +61,8 @@ const userResolver = {
     },
 
     userLogin: async ({ email, password }) => {
-        await userValidate({ email, password });        
+
+        await userValidate({ email, password });
         const user = await UserModel.findOne({ email });
         if (!user) {
             throw new Error("Can't find user")
@@ -74,15 +75,13 @@ const userResolver = {
         const { _id, name, avatarURL, createdAt } = user;
 
         return {
-            _id, name, avatarURL, createdAt, token,
+            _id, email, name, avatarURL, createdAt, token,
             message: `User ${name} successfully logged`
         };
     },
 
     userUpdateName: async ({ name }, context) => {
-        if (!name) {
-            throw new Error("No data");
-        };
+        await userValidate({ name });
 
         const id = checkAuth(context.auth);
         if (id) {
@@ -92,7 +91,7 @@ const userResolver = {
             }
 
             await userValidate({ name });
-            
+
             if (name === user.name) {
                 throw new Error("The same name!")
             };
@@ -112,9 +111,9 @@ const userResolver = {
         }
     },
 
-    userDelete: async ({  _id }, context) => {
+    userDelete: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
-        if (id) {            
+        if (id) {
             const user = await UserModel.findById(id);
             if (!user) {
                 throw new Error("Can't find user")
