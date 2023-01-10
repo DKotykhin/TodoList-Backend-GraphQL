@@ -42,7 +42,7 @@ const schema = buildSchema(`
         subtitle: String
         description: String
         completed: Boolean
-        deadline: String
+        deadline: Date
         createdAt: Date
         updatedAt: Date
         message: String
@@ -91,7 +91,7 @@ const schema = buildSchema(`
         subtitle: String
         description: String
         completed: Boolean
-        deadline: String        
+        deadline: Date        
     }
     
     type Query {        
