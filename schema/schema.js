@@ -8,6 +8,14 @@ const schema = buildSchema(`
         email: String!
         avatarURL: String        
         createdAt: Date        
+        message: String              
+    }
+    type UserWithToken {
+        _id: ID!
+        name: String!
+        email: String!
+        avatarURL: String        
+        createdAt: Date        
         token: String
         message: String              
     }
@@ -34,7 +42,7 @@ const schema = buildSchema(`
         subtitle: String
         description: String
         completed: Boolean
-        deadline: Date
+        deadline: String
         createdAt: Date
         updatedAt: Date
         message: String
@@ -83,17 +91,17 @@ const schema = buildSchema(`
         subtitle: String
         description: String
         completed: Boolean
-        deadline: Date        
+        deadline: String        
     }
     
     type Query {        
         getUserByToken: User        
         getTasks(paramsInput: TaskParamsInput): getTasksResponse
-        userLogin(email: String!, password: String!): User
+        userLogin(email: String!, password: String!): UserWithToken
     }
     
     type Mutation {
-        userRegister(registerInput: UserRegisterInput): User
+        userRegister(registerInput: UserRegisterInput): UserWithToken
         userDelete(_id: ID!): UserDeleteResponse
         userUpdateName(name: String!): User
         userConfirmPassword(password: String!): UserPasswordResponse

@@ -14,61 +14,56 @@ const passwordResolver = {
 
     userUpdatePassword: async ({ password }, context) => {
         const id = checkAuth(context.auth);
-        if (id) {
-            const user = await UserModel.findById(id);
-            if (!user) {
-                throw new Error("Can't find user")
-            }
 
-            await userValidate({ password });
-            const isValidPass = await bcrypt.compare(password, user.passwordHash);
-            if (isValidPass) {
-                throw new Error("The same password!")
-            }
-            const passwordHash = await createPasswordHash(password);
-            const updatedUser = await UserModel.findOneAndUpdate(
-                { _id: id },
-                { passwordHash },
-                { returnDocument: 'after' },
-            );
+        const user = await UserModel.findById(id);
+        if (!user) {
+            throw new Error("Can't find user")
+        }
 
-            if (updatedUser) {
-                return {
-                    status: true,
-                    message: "Password successfully updated",
-                };
-            } else {
-                return {
-                    status: false,
-                    message: "Can't change password",
-                };
-            }
+        await userValidate({ password });
+        const isValidPass = await bcrypt.compare(password, user.passwordHash);
+        if (isValidPass) {
+            throw new Error("The same password!")
+        }
+        const passwordHash = await createPasswordHash(password);
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { _id: id },
+            { passwordHash },
+            { returnDocument: 'after' },
+        );
+
+        if (updatedUser) {
+            return {
+                status: true,
+                message: "Password successfully updated",
+            };
         } else {
-            throw new Error('No autorization data')
+            return {
+                status: false,
+                message: "Can't change password",
+            };
         }
     },
 
     userConfirmPassword: async ({ password }, context) => {
+        await userValidate({ password });
         const id = checkAuth(context.auth);
-        if (id) {
-            const user = await UserModel.findById(id);
-            if (!user) {
-                throw new Error("Can't find user")
+
+        const user = await UserModel.findById(id);
+        if (!user) {
+            throw new Error("Can't find user")
+        }
+
+        const isValidPass = await bcrypt.compare(password, user.passwordHash);
+        if (!isValidPass) {
+            return {
+                status: false,
+                message: "Wrong password!"
             }
-
-            await userValidate({ password });
-
-            const isValidPass = await bcrypt.compare(password, user.passwordHash);
-            if (!isValidPass) {
-                return {
-                    status: false,
-                    message: "Wrong password!"
-                }
-            } else {
-                return {
-                    status: true,
-                    message: 'Password confirmed'
-                }
+        } else {
+            return {
+                status: true,
+                message: 'Password confirmed'
             }
         }
     },

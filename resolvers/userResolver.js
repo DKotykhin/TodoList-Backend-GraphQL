@@ -23,28 +23,28 @@ const userResolver = {
 
     getUserByToken: async (_, context) => {
         const id = checkAuth(context.auth);
-        if (id) {
-            const user = await UserModel.findById(id);
-            if (!user) {
-                throw new Error("Can't find user")
-            }
-            const { _id, email, name, createdAt, avatarURL } = user;
-            return {
-                _id, email, name, createdAt, avatarURL,
-                message: `User ${name} successfully logged via token`,
-            };
-        } else {
-            throw new Error('No autorization data')
+
+        const user = await UserModel.findById(id);
+        if (!user) {
+            throw new Error("Can't find user")
         }
+
+        const { _id, email, name, createdAt, avatarURL } = user;
+        return {
+            _id, email, name, createdAt, avatarURL,
+            message: `User ${name} successfully logged via token`,
+        };
     },
 
     userRegister: async ({ registerInput }) => {
         await userValidate(registerInput);
         const { email, name, password } = registerInput;
+
         const candidat = await UserModel.findOne({ email });
         if (candidat) {
             throw new Error(`User ${email} already exist`)
         }
+
         const passwordHash = await createPasswordHash(password);
         const user = await UserModel.create({
             email,
@@ -61,16 +61,18 @@ const userResolver = {
     },
 
     userLogin: async ({ email, password }) => {
-
         await userValidate({ email, password });
+
         const user = await UserModel.findOne({ email });
         if (!user) {
             throw new Error("Can't find user")
         }
+
         const isValidPass = await bcrypt.compare(password, user.passwordHash)
         if (!isValidPass) {
             throw new Error('Incorrect login or password')
         }
+
         const token = generateToken(user._id);
         const { _id, name, avatarURL, createdAt } = user;
 
@@ -82,63 +84,54 @@ const userResolver = {
 
     userUpdateName: async ({ name }, context) => {
         await userValidate({ name });
-
         const id = checkAuth(context.auth);
-        if (id) {
-            const user = await UserModel.findById(id);
-            if (!user) {
-                throw new Error("Can't find user")
-            }
 
-            await userValidate({ name });
-
-            if (name === user.name) {
-                throw new Error("The same name!")
-            };
-            const updatedUser = await UserModel.findOneAndUpdate(
-                { _id: id },
-                { name },
-                { returnDocument: 'after' },
-            );
-            const { _id, email, avatarURL, createdAt } = updatedUser;
-
-            return {
-                _id, email, name: updatedUser.name, avatarURL, createdAt,
-                message: `User ${updatedUser.name} successfully updated`,
-            };
-        } else {
-            throw new Error('No autorization data')
+        const user = await UserModel.findById(id);
+        if (!user) {
+            throw new Error("Can't find user")
         }
+        if (name === user.name) {
+            throw new Error("The same name!")
+        };
+
+        const updatedUser = await UserModel.findOneAndUpdate(
+            { _id: id },
+            { name },
+            { returnDocument: 'after' },
+        );
+        const { _id, email, avatarURL, createdAt } = updatedUser;
+
+        return {
+            _id, email, name: updatedUser.name, avatarURL, createdAt,
+            message: `User ${updatedUser.name} successfully updated`,
+        };
     },
 
     userDelete: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
-        if (id) {
-            const user = await UserModel.findById(id);
-            if (!user) {
-                throw new Error("Can't find user")
+
+        const user = await UserModel.findById(id);
+        if (!user) {
+            throw new Error("Can't find user")
+        }
+
+        if (id === _id) {
+            if (user.avatarURL) {
+                fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
+                    if (err) {
+                        throw new Error("Can't delete avatar")
+                    }
+                })
             }
+            const taskStatus = await TaskModel.deleteMany({ author: id });
+            const userStatus = await UserModel.deleteOne({ _id: id });
 
-            if (id === _id) {
-                if (user.avatarURL) {
-                    fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
-                        if (err) {
-                            throw new Error("Can't delete avatar")
-                        }
-                    })
-                }
-                const taskStatus = await TaskModel.deleteMany({ author: id });
-                const userStatus = await UserModel.deleteOne({ _id: id });
-
-                return {
-                    taskStatus, userStatus,
-                    message: 'User successfully deleted'
-                }
-            } else {
-                throw new Error("Authification error")
+            return {
+                taskStatus, userStatus,
+                message: 'User successfully deleted'
             }
         } else {
-            throw new Error('No autorization data')
+            throw new Error("Authification error")
         }
     }
 
