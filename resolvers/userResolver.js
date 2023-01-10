@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/User.js';
 import TaskModel from '../models/Task.js';
 import { checkAuth } from '../middlewares/checkAuth.js';
+import { findUser } from '../middlewares/findUser.js';
 import { userValidate } from '../validation/validation.js';
 
 const generateToken = (_id) => {
@@ -23,11 +24,7 @@ const userResolver = {
 
     getUserByToken: async (_, context) => {
         const id = checkAuth(context.auth);
-
-        const user = await UserModel.findById(id);
-        if (!user) {
-            throw new Error("Can't find user")
-        }
+        const user = await findUser(id);
 
         const { _id, email, name, createdAt, avatarURL } = user;
         return {
@@ -85,11 +82,8 @@ const userResolver = {
     userUpdateName: async ({ name }, context) => {
         await userValidate({ name });
         const id = checkAuth(context.auth);
+        const user = await findUser(id);
 
-        const user = await UserModel.findById(id);
-        if (!user) {
-            throw new Error("Can't find user")
-        }
         if (name === user.name) {
             throw new Error("The same name!")
         };
@@ -109,11 +103,7 @@ const userResolver = {
 
     userDelete: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
-
-        const user = await UserModel.findById(id);
-        if (!user) {
-            throw new Error("Can't find user")
-        }
+        const user = await findUser(id);
 
         if (id === _id) {
             if (user.avatarURL) {

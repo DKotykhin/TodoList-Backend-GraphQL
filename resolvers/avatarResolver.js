@@ -1,9 +1,10 @@
 import fs from 'fs';
 
-import { checkAuth } from '../middlewares/checkAuth.js';
-import { userValidate } from '../validation/validation.js';
-
 import UserModel from '../models/User.js';
+
+import { checkAuth } from '../middlewares/checkAuth.js';
+import { findUser } from '../middlewares/findUser.js';
+import { userValidate } from '../validation/validation.js';
 
 const avatarResolver = {
 
@@ -32,11 +33,8 @@ const avatarResolver = {
 
     deleteAvatar: async ({ _id }, context) => {
         const id = checkAuth(context.auth);
-        const user = await UserModel.findById(id);
-        if (!user) {
-            throw new Error("Can't find user")
-        }
-        
+        const user = await findUser(id);
+
         if (id === _id) {
             if (user.avatarURL) {
                 fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
