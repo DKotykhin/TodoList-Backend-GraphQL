@@ -85,8 +85,15 @@ const schema = buildSchema(`
         sortOrder: Int
         search: String
     }
-    input TaskInput {
-        _id: ID       
+    input TaskAddInput {     
+        title: String!
+        subtitle: String
+        description: String
+        completed: Boolean
+        deadline: Date        
+    }
+    input TaskUpdateInput {
+        _id: ID!      
         title: String!
         subtitle: String
         description: String
@@ -108,8 +115,8 @@ const schema = buildSchema(`
         userUpdatePassword(password: String!): UserPasswordResponse
         uploadAvatar(avatarURL: String!): UserAvatarResponse
         deleteAvatar(_id: ID!): UserAvatarResponse
-        createTask(createTaskInput: TaskInput): Task
-        updateTask(updateTaskInput: TaskInput): TaskUpdateResponse
+        createTask(createTaskInput: TaskAddInput): Task
+        updateTask(updateTaskInput: TaskUpdateInput): TaskUpdateResponse
         deleteTask(_id: ID!): TaskDeleteResponse
     }
 `);
