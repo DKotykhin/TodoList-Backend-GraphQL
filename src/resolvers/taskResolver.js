@@ -9,25 +9,25 @@ const taskResolver = {
 
         const params = paramsInput ? paramsInput : {};
         const { limit, page, tabKey, sortField, sortOrder, search } = params;
+
         const tasksOnPage = limit > 0 ? limit : 6;
-        const pageNumber = page > 0 ? page : 1;
-        const tabKeyNumber = tabKey >= 0 ? tabKey : 0;
-        const sortFieldString = sortField ? sortField : "createdAt";
-        const sortOrderNumber = sortOrder ? sortOrder : -1;
+        const parsePage = page > 0 ? page : 1;
+        const parseSortField = sortField ? sortField : "createdAt";
+        const parseSortOrder = sortOrder ? sortOrder : -1;
 
         let taskFilter = { author: id };
-        if (tabKeyNumber === 1) taskFilter = { ...taskFilter, completed: false };
-        if (tabKeyNumber === 2) taskFilter = { ...taskFilter, completed: true };
+        if (tabKey === 1) taskFilter = { ...taskFilter, completed: false };
+        if (tabKey === 2) taskFilter = { ...taskFilter, completed: true };
         if (search) taskFilter =
             { ...taskFilter, title: { $regex: search, $options: 'i' } };
 
         let sortKey;
-        switch (sortFieldString) {
-            case 'createdAt': sortKey = { createdAt: sortOrderNumber }
+        switch (parseSortField) {
+            case 'createdAt': sortKey = { createdAt: parseSortOrder }
                 break;
-            case 'deadline': sortKey = { deadline: sortOrderNumber }
+            case 'deadline': sortKey = { deadline: parseSortOrder }
                 break;
-            case 'title': sortKey = { title: sortOrderNumber }
+            case 'title': sortKey = { title: parseSortOrder }
                 break;
             default: sortKey = { createdAt: -1 }
         };
@@ -43,7 +43,7 @@ const taskResolver = {
             completed: true,
             createdAt: true,
             deadline: true
-        }).sort(sortKey).limit(tasksOnPage).skip((pageNumber - 1) * tasksOnPage);
+        }).sort(sortKey).limit(tasksOnPage).skip((parsePage - 1) * tasksOnPage);
 
         const tasksOnPageQty = tasks.length;
 
