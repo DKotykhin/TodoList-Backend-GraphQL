@@ -46,17 +46,7 @@ const schema = buildSchema(`
         createdAt: Date
         updatedAt: Date
         message: String
-    }
-    type TaskUpdateResponse {
-        status: TaskUpdateStatus        
-        message: String
-    }
-    type TaskUpdateStatus {
-        matchedCount: Int
-        modifiedCount: Int
-        upsertedId: ID
-        acknowledged: Boolean
-    }
+    }    
     type TaskDeleteResponse {
         status: TaskDeleteStatus        
         message: String 
@@ -116,7 +106,7 @@ const schema = buildSchema(`
         uploadAvatar(avatarURL: String!): UserAvatarResponse
         deleteAvatar(_id: ID!): UserAvatarResponse
         createTask(createTaskInput: TaskAddInput): Task
-        updateTask(updateTaskInput: TaskUpdateInput): TaskUpdateResponse
+        updateTask(updateTaskInput: TaskUpdateInput): Task
         deleteTask(_id: ID!): TaskDeleteResponse
     }
 `);

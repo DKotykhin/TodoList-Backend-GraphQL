@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { graphqlHTTP } from "express-graphql";
 
-import { userResolver, avatarResolver, passwordResolver, taskResolver } from "../resolvers/index.js";
+import { userResolver, taskResolver } from "../resolvers/index.js";
 import schema from "../schema/schema.js";
 
 import { upload } from '../middlewares/multerUpload.js';
@@ -12,7 +12,7 @@ const router = new Router();
 router.use('/graphql', (req, res) => {
     graphqlHTTP({
         schema,
-        rootValue: { ...userResolver, ...passwordResolver, ...avatarResolver, ...taskResolver },
+        rootValue: { ...userResolver, ...taskResolver },
         graphiql: true,
         context: {
             auth: req.headers.authorization

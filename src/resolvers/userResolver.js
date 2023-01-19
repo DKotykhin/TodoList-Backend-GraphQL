@@ -1,32 +1,13 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-
-import UserModel from '../models/User.js';
-import TaskModel from '../models/Task.js';
-import { checkAuth } from '../middlewares/checkAuth.js';
-import { findUser } from '../middlewares/findUser.js';
-import { userValidate } from '../validation/validation.js';
-
-const generateToken = (_id) => {
-    return jwt.sign(
-        { _id },
-        process.env.SECRET_KEY,
-        { expiresIn: "2d" }
-    )
-};
-const createPasswordHash = async (password) => {
-    const salt = await bcrypt.genSalt(5);
-    const passwordHash = await bcrypt.hash(password, salt);
-    return passwordHash
-};
+import userService from '../service/userService.js';
+import avatarService from '../service/avatarService.js';
+import passwordService from '../service/passwordService.js';
 
 const userResolver = {
 
     getUserByToken: async (_, context) => {
-        const id = checkAuth(context.auth);
-        const user = await findUser(id);
-
+        const user = await userService.loginByToken(context.auth);
         const { _id, email, name, createdAt, avatarURL } = user;
+
         return {
             _id, email, name, createdAt, avatarURL,
             message: `User ${name} successfully logged via token`,
@@ -34,22 +15,8 @@ const userResolver = {
     },
 
     userRegister: async ({ registerInput }) => {
-        await userValidate(registerInput);
-        const { email, name, password } = registerInput;
-
-        const candidat = await UserModel.findOne({ email });
-        if (candidat) {
-            throw new Error(`User ${email} already exist`)
-        }
-
-        const passwordHash = await createPasswordHash(password);
-        const user = await UserModel.create({
-            email,
-            passwordHash,
-            name,
-        });
-        const token = generateToken(user._id);
-        const { _id, createdAt } = user;
+        const user = await userService.register(registerInput);
+        const { user: { _id, email, name, createdAt }, token } = user;
 
         return {
             _id, email, name, createdAt, token,
@@ -58,20 +25,8 @@ const userResolver = {
     },
 
     userLogin: async ({ email, password }) => {
-        await userValidate({ email, password });
-
-        const user = await UserModel.findOne({ email });
-        if (!user) {
-            throw new Error("Can't find user")
-        }
-
-        const isValidPass = await bcrypt.compare(password, user.passwordHash)
-        if (!isValidPass) {
-            throw new Error('Incorrect login or password')
-        }
-
-        const token = generateToken(user._id);
-        const { _id, name, avatarURL, createdAt } = user;
+        const user = await userService.login({ email, password })
+        const { user: { _id, name, avatarURL, createdAt }, token } = user;
 
         return {
             _id, email, name, avatarURL, createdAt, token,
@@ -80,48 +35,57 @@ const userResolver = {
     },
 
     userUpdateName: async ({ name }, context) => {
-        await userValidate({ name });
-        const id = checkAuth(context.auth);
-        const user = await findUser(id);
-
-        if (name === user.name) {
-            throw new Error("The same name!")
-        };
-
-        const updatedUser = await UserModel.findOneAndUpdate(
-            { _id: id },
-            { name },
-            { returnDocument: 'after' },
-        );
+        const updatedUser = await userService.updateName(name, context.auth);
         const { _id, email, avatarURL, createdAt } = updatedUser;
 
         return {
-            _id, email, name: updatedUser.name, avatarURL, createdAt,
-            message: `User ${updatedUser.name} successfully updated`,
+            _id, email, name, avatarURL, createdAt,
+            message: `User ${name} successfully updated`,
         };
     },
 
-    userDelete: async ({ _id }, context) => {
-        const id = checkAuth(context.auth);
-        const user = await findUser(id);
+    userUpdatePassword: async ({ password }, context) => {
+        const updatedUser = await passwordService.updatePassword(password, context.auth);
 
-        if (id === _id) {
-            if (user.avatarURL) {
-                fs.unlink("uploads/" + user.avatarURL.split('/')[2], async (err) => {
-                    if (err) {
-                        throw new Error("Can't delete avatar")
-                    }
-                })
-            }
-            const taskStatus = await TaskModel.deleteMany({ author: id });
-            const userStatus = await UserModel.deleteOne({ _id: id });
-
+        if (updatedUser) {
             return {
-                taskStatus, userStatus,
-                message: 'User successfully deleted'
-            }
-        } else {
-            throw new Error("Authification error")
+                status: true,
+                message: "Password successfully updated",
+            };
+        }
+    },
+
+    userConfirmPassword: async ({ password }, context) => {
+        const status = await passwordService.confirmPassword(password, context.auth);
+
+        return status;
+    },
+
+    userDelete: async ({ _id }, context) => {
+        const status = await userService.delete(_id, context.auth);
+
+        return {
+            ...status,
+            message: 'User successfully deleted'
+        };
+    },
+
+    uploadAvatar: async ({ avatarURL }, context) => {        
+        const user = await avatarService.uploadUrl(avatarURL, context.auth);
+
+        return {
+            avatarURL: user.avatarURL,
+            message: "Avatar URL successfully upload.",
+        };
+    },
+
+    deleteAvatar: async ({ _id }, context) => {        
+        const updatedUser = await avatarService.delete(_id, context.auth);
+        const { avatarURL } = updatedUser;
+
+        return {
+            avatarURL,
+            message: "Avatar successfully deleted.",
         }
     }
 
