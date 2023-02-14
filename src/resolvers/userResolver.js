@@ -70,7 +70,7 @@ const userResolver = {
         };
     },
 
-    uploadAvatar: async ({ avatarURL }, context) => {        
+    uploadAvatar: async ({ avatarURL }, context) => {
         const user = await avatarService.uploadUrl(avatarURL, context.auth);
 
         return {
@@ -79,7 +79,7 @@ const userResolver = {
         };
     },
 
-    deleteAvatar: async ({ _id }, context) => {        
+    deleteAvatar: async ({ _id }, context) => {
         const updatedUser = await avatarService.delete(_id, context.auth);
         const { avatarURL } = updatedUser;
 
@@ -87,8 +87,15 @@ const userResolver = {
             avatarURL,
             message: "Avatar successfully deleted.",
         }
-    }
+    },
 
+    getStatistic: async (_, context) => {
+        const taskStatistic = await userService.statistic(context.auth);
+        return {
+            ...taskStatistic,
+            message: 'Statistic successfully obtained'
+        };
+    }
 };
 
 export default userResolver;

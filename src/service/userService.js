@@ -93,6 +93,38 @@ class UserService {
             throw new GraphQLError("Authification error")
         }
     }
+
+    async statistic(token) {
+        const _id = checkAuth(token);
+        const totalTasks = TaskModel.countDocuments(
+            { author: _id }
+        );
+        const completedTasks = TaskModel.countDocuments(
+            {
+                author: _id,
+                completed: true
+            }
+        );
+        const nowDate = new Date().toISOString();
+        const overdueTasks = TaskModel.countDocuments(
+            {
+                author: _id,
+                deadline: { $lt: nowDate },
+                completed: false
+            }
+        );
+        const values = Promise.all([totalTasks, completedTasks, overdueTasks]).then(values => {
+            const activeTasks = values[0] - values[1];
+            return {
+                totalTasks: values[0],
+                completedTasks: values[1],
+                activeTasks,
+                overdueTasks: values[2]
+            }
+        });
+
+        return values;
+    }
 }
 
 export default new UserService;
