@@ -14,22 +14,22 @@ class TaskService {
         const tasksOnPage = limit > 0 ? limit : 6;
         const parsePage = page > 0 ? page : 1;
         const parseSortOrder = sortOrder === -1 ? -1 : sortOrder === 1 ? 1 : -1;
-        console.log(parseSortOrder)
-
-        let sortKey;
+       
+        let sortKey = {};
         switch (sortField) {
-            case 'createdAt': sortKey = { createdAt: parseSortOrder }
+            case "createdAt": sortKey = { [sortField]: parseSortOrder };
                 break;
-            case 'deadline': sortKey = { deadline: parseSortOrder }
+            case "deadline": sortKey = { [sortField]: -parseSortOrder };
                 break;
-            case 'title': sortKey = { title: parseSortOrder }
+            case "title": sortKey = { [sortField]: -parseSortOrder };
                 break;
-            default: sortKey = { createdAt: -1 }
+            default: sortKey = { createdAt: -1 };
         };
 
         let taskFilter = { author: id };
         if (tabKey === 1) taskFilter = { ...taskFilter, completed: false };
         if (tabKey === 2) taskFilter = { ...taskFilter, completed: true };
+        
         if (search) taskFilter =
             { ...taskFilter, title: { $regex: search, $options: 'i' } };
 
