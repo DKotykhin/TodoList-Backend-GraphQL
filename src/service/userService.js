@@ -58,7 +58,7 @@ class UserService {
         await userValidate({ name });
         const _id = checkAuth(token);
         const user = await findUser(_id);
-        
+
         if (name === user.name) {
             throw new GraphQLError("The same name!")
         };
@@ -105,11 +105,10 @@ class UserService {
                 completed: true
             }
         );
-        const nowDate = new Date().toISOString();
         const overdueTasks = TaskModel.countDocuments(
             {
                 author: _id,
-                deadline: { $lt: nowDate },
+                deadline: { $lt: new Date() },
                 completed: false
             }
         );
