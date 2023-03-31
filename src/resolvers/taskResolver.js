@@ -10,20 +10,18 @@ const taskResolver = {
 
     createTask: async ({ createTaskInput }, context) => {
         const newTask = await taskService.create(createTaskInput, context.auth);
-        const { _id, title, subtitle, description, completed, createdAt, deadline } = newTask;
 
         return {
-            _id, title, subtitle, description, completed, createdAt, deadline,
+            ...newTask._doc,
             message: 'Task successfully created'
         };
     },
 
     updateTask: async ({ updateTaskInput }, context) => {
         const updatedTask = await taskService.update(updateTaskInput, context.auth);
-        const { _id, title, subtitle, description, completed, createdAt, deadline } = updatedTask;
 
         return {
-            _id, title, subtitle, description, completed, createdAt, deadline,
+            ...updatedTask._doc,
             message: 'Task successfully updated'
         };
     },
