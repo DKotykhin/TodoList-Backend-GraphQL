@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { graphqlHTTP } from "express-graphql";
 
 import { userResolver, taskResolver } from "../resolvers/index.js";
 import schema from "../schema/schema.js";
+
+import { createHandler } from 'graphql-http/lib/use/express';
 
 import { upload } from '../middlewares/multerUpload.js';
 import { checkAuth } from '../middlewares/checkAuth.js';
@@ -10,16 +11,12 @@ import { checkAuth } from '../middlewares/checkAuth.js';
 const router = new Router();
 
 router.use('/graphql', (req, res) => {
-    graphqlHTTP({
-        schema,
-        rootValue: { ...userResolver, ...taskResolver },
-        graphiql: true,
+    createHandler({
+        schema,        
+        rootValue: { ...userResolver, ...taskResolver },        
         context: {
             auth: req.headers.authorization
         },
-        customFormatErrorFn: (err) => {
-            return ({ message: err.message })
-        }
     })(req, res)
 });
 
